@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/devmiro/go-stockbot/api"
@@ -60,7 +61,11 @@ func (b *Broker) SetUp(ch *amqp.Channel) {
 	b.Channel = ch
 }
 
+var mu sync.Mutex
+
 func (b *Broker) PublishMessage(sr StockReponse) {
+	mu.Lock()
+	defer mu.Unlock()
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
